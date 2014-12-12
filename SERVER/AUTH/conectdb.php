@@ -24,12 +24,12 @@ function getResultFromDataBase($sql_request){
 	$sth = $db->prepare($sql_request);
 	$sth->execute();
 	
+	$output = "";
+	
 	$result = $sth->fetchAll(PDO::FETCH_ASSOC);
 	foreach ( $result as $row){
 		$output[] = $row;
 	}
-
-	var_dump($result);
 
 	return $output;
 }
