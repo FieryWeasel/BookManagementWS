@@ -3,7 +3,7 @@ include_once '../conectdb.php';
 include_once '../debug.php';
 include_once '../keys.php';
 
-$name = explode('auth.php', $_SERVER['REQUEST_URI']);
+$name = explode('user.php', $_SERVER['REQUEST_URI']);
 if(isset($name[1]) ){
 	$array = explode('/', $name[1]);
 
@@ -12,10 +12,10 @@ if(isset($name[1]) ){
 		$name_function = $array[2];
 	}
 
-	if( isset($array[1]) && $array[1] == "book"){
+	if( isset($array[1]) && $array[1] == "user"){
 	switch ($name_function){
-		case "canConnect":
-			canConnect($_POST);
+		case "get":
+			get($_POST);
 			break;
 		case "add":
 			add($_POST);
@@ -33,44 +33,33 @@ if(isset($name[1]) ){
 	}
 }
 
-
-if(!$isFunctionLaunched){
-	?>No function to launch<br/><?php
-}
-
-
-function listBooks($array) {
-	// Request into the BDD
-	$jsonObj = getResultFromDataBase('SELECT * FROM book', 'books');
-
-	print_r(json_encode($jsonObj));
-}
-
-function get($array) {
-	$book_id = "";
-	if(isset($array[3]) && $array[3] == 'isbn' && isset($array[4])){
-		$book_id = $array[4];
+function get($connectInfos) {
+	$keys = new keys();
 	
-		// Request into the BDD
-		$jsonObj = getResultFromDataBase('SELECT * FROM book WHERE UPPER(isbn) LIKE UPPER("'.$book_id.'")', 'books');
-
-		if($jsonObj == ""){
-			// Display an error
-			displayDebugMsg("No result for "+$book_id);
-			print(json_encode($jsonObj));
-		} else {
-			displayDebugMsg("Result here for "+$book_id);
-			print(json_encode($jsonObj));
-		}
-	} else {
-		displayDebugMsg("Error - Header of function "+$array[2]+" not correct (/book/isbn/X-XXX-XXXXX-X)");
+	if(!isset($connectInfos['id'])){
+		displayDebugMsg("Error - Need a 'user_id'");
+		$arr_response[$keys->RES_key] = $keys->RES_Result_No;
+		$arr_response[$keys->ERR_key] = $keys->ERR_Bad_Arguments;
+		echo(json_encode($arr_response));
+		return;
 	}
+		
+	$jsonObj = getResultFromDataBase('SELECT * FROM user WHERE id='. $connectInfos['id'] .'');
+	
+	if($jsonObj == ""){
+		$arr_response[$keys->RES_key] = $keys->RES_Result_No;
+		$arr_response[$keys->ERR_key] = $keys->ERR_No_Result_Found;
+	} else {
+		$arr_response[$keys->RES_key] = $keys->RES_Result_Yes;
+		$arr_response['users'] = $jsonObj;
+	}
+	
+	echo(json_encode($arr_response));
 }
 
 function add($userInfos){
 	$keys = new keys();
-	var_dump($userInfos);
-	
+		
 	if(		!isset($userInfos['first_name'])
 		||	!isset($userInfos['last_name'])
 		||	!isset($userInfos['nickname'])
@@ -83,15 +72,17 @@ function add($userInfos){
 		return;
 	}
 	
-	$res = getResultFromDataBase("INSERT INTO user (first_name, last_name, nickname, birth_date, email) VALUES ('".$userInfos['first_name']."', '".$userInfos['last_name']."', '".$userInfos['nickname']."', '".$userInfos['birth_date']."', '".$userInfos['email']."')", 'auth');
+	$res = getResultFromDataBase("INSERT INTO user (first_name, last_name, nickname, birth_date, email) VALUES ('".$userInfos['first_name']."', '".$userInfos['last_name']."', '".$userInfos['nickname']."', '".$userInfos['birth_date']."', '".$userInfos['email']."')");
+	
+	$jsonObj = getResultFromDataBase('SELECT * FROM user WHERE id='. $connectInfos['id'] .'');
 	
 	if($res == 0){
 		$arr_response[$keys->RES_key] = $keys->RES_Result_Yes;
-		echo(json_encode($arr_response));
 	} else if($res == -1){
 		$arr_response[$keys->RES_key] = $keys->RES_Result_No;
-		echo(json_encode($arr_response));
 	}
+	
+	echo(json_encode($arr_response));
 }
 
 function delete($userInfos){

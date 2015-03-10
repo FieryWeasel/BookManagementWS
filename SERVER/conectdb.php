@@ -1,9 +1,9 @@
 <?php
 function connect(){
-	$hostname = "localhost";
-	$username = "root";
-	$password = null;
-	$db_name = "books_mng";
+	$hostname = "mysql.hostinger.fr";
+	$username = "u446795347_root";
+	$password = "rootlp";
+	$db_name = "u446795347_wsbm";
 	
 	$db = null;
 	

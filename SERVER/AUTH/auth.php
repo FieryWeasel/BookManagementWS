@@ -1,198 +1,191 @@
 <?php
-include_once 'conectdb.php';
+include_once '../conectdb.php';
 include_once '../debug.php';
 include_once '../keys.php';
 
-$array = explode('/', $_SERVER['REQUEST_URI']);
 
-$name_function = "";
-if(isset($array[2]) ){
-	$name_function = $array[2];
+$name = explode('auth.php', $_SERVER['REQUEST_URI']);
+if(isset($name[1]) ){
+	$array = explode('/', $name[1]);
+
+	$name_function = "";
+	if(isset($array[2]) ){
+		$name_function = $array[2];
+	}
+
+	if( isset($array[1]) && $array[1] == "user"){
+	switch ($name_function){
+		case "isExist":
+			isExist($_POST);
+			break;
+		case "canConnect":
+			canConnect($_POST);
+			break;
+		case "add":
+			add($_POST);
+			break;
+		case "modify":
+			modify($_POST);
+			break;
+		case "delete":
+			delete($_POST);
+			break;
+		default:
+			?>No function to launch<br/><?php
+			break;
+		}
+	}
 }
 
-$isFunctionLaunched = false;
-
-switch ($name_function){
-	case "isExist":
-		isExist($array);
-		break;
-	case "verifyPassword":
-		verifyPassword($_POST);
-		break;
-	case "createUser":
-		createUser($_POST);
-		break;
-	case "deleteUser":
-		deleteUser($_POST);
-		break;
-	default:
-		?>No function to launch<br/><?php
-		break;
-}
-
-
-function isExist($array) {
+function isExist($connectInfos) {
 	$keys = new keys();
-	$user_name = "No_name";
 	
-	if(isset($array[3]) && $array[3] != 'user' || !isset($array[4])){
-		displayDebugMsg("Error - Header of function "+$array[2]+" not correct (/isExist/user/XXXX)");
+	if(!isset($connectInfos['id'])){
+		displayDebugMsg("Error - Need a 'user_id'");
+		$arr_response[$keys->RES_key] = $keys->RES_Result_No;
 		$arr_response[$keys->ERR_key] = $keys->ERR_Bad_Arguments;
 		echo(json_encode($arr_response));
 		return;
 	}
-	
-	$user_name = $array[4];
-	
+		
 	// Request into the BDD
-	$jsonObj = getResultFromDataBase('SELECT * FROM user WHERE UPPER(nickname) LIKE UPPER("'.$user_name.'")', 'auth');
+	$jsonObj = getResultFromDataBase('SELECT * FROM user WHERE id='. $connectInfos['id'] .'');
 	
 	if($jsonObj == ""){
+		$arr_response[$keys->RES_key] = $keys->RES_Result_No;
 		$arr_response[$keys->ERR_key] = $keys->ERR_No_Result_Found;
-		echo(json_encode($arr_response));
 	} else {
-		displayDebugMsg("Result here for ".$user_name);
-		echo(json_encode($jsonObj));
+		$arr_response[$keys->RES_key] = $keys->RES_Result_Yes;
+		displayDebugMsg("Result here for user_id : ".$user_id);
 	}
 	
+	echo(json_encode($arr_response));
 }
 
-function verifyPassword($connectInfos){
+function canConnect($userInfos){
 	$keys = new keys();
 	
-	if(!isset($connectInfos['user_id']) || !isset($connectInfos['crypted_key'])){
-		displayDebugMsg("Error - Need a 'user_id' and a 'cryted_key'");
-		$arr_response[$keys->$ERR_key] = $keys->ERR_Bad_Arguents;
+	if(!isset($userInfos["crypted_key"])){
+		displayDebugMsg("Error - Need a 'cryted_key'");
+		$arr_response[$keys->RES_key] = $keys->RES_Result_No;
+		$arr_response[$keys->ERR_key] = $keys->ERR_Bad_Arguments;
+		$arr_response["crypted_key"] = $userInfos["crypted_key"];
 		echo(json_encode($arr_response));
 		return;
 	}
 	
-	$user_id = $connectInfos['user_id'];
-	$crypted_key = $connectInfos['crypted_key'];
-	
-	$jsonObj = getResultFromDataBase('SELECT * FROM account WHERE user_id = '.$user_id.'', 'auth');
-	
+	$jsonObj = getResultFromDataBase('SELECT * FROM account WHERE crypted_key LIKE \''. $userInfos["crypted_key"] .'\'');
+		
 	if($jsonObj == ""){
 		$arr_response[$keys->RES_key] = $keys->RES_Result_No;
-		echo(json_encode($arr_response));
+		$arr_response["crypted_key"] = $userInfos["crypted_key"];
 	} else {
-		if(strcmp($jsonObj[0]['crypted_key'], $crypted_key) == 0){
-			$arr_response[$keys->RES_key] = $keys->RES_Result_Yes;
-			echo(json_encode($arr_response));
-		} else {
-			$arr_response[$keys->RES_key] = $keys->RES_Result_No;
-			echo(json_encode($arr_response));
-		}
+		$arr_response[$keys->RES_key] = $keys->RES_Result_Yes;
+		$arr_response["id"] = $jsonObj[0]["user_id"];
 	}
+	
+	echo(json_encode($arr_response));
 }
 
-function createUser($userInfos){
+function add($userInfos){
 	$keys = new keys();
-	var_dump($userInfos);
 	
-	if(		!isset($userInfos['first_name'])
-		||	!isset($userInfos['last_name'])
-		||	!isset($userInfos['nickname'])
-		|| 	!isset($userInfos['birth_date'])
-		||	!isset($userInfos['email']))
+	if(		!isset($userInfos['id'])
+		||	!isset($userInfos['crypted_key']))
 	{
-		displayDebugMsg("Error - Need a 'first_name' / 'last_name' / 'nickname' / 'birth_date' / 'email' argments");
+		displayDebugMsg("Error - Need a 'id' / 'crypted_key' argments");
+		$arr_response[$keys->RES_key] = $keys->RES_Result_No;
 		$arr_response[$keys->ERR_key] = $keys->ERR_Bad_Arguments;
 		echo(json_encode($arr_response));
 		return;
 	}
 	
-	$res = getResultFromDataBase("INSERT INTO user (first_name, last_name, nickname, birth_date, email) VALUES ('".$userInfos['first_name']."', '".$userInfos['last_name']."', '".$userInfos['nickname']."', '".$userInfos['birth_date']."', '".$userInfos['email']."')", 'auth');
+	$jsonObj = getResultFromDataBase('SELECT * FROM user WHERE id = '.$userInfos['id']);
+	
+	if($jsonObj != ""){
+		$arr_response[$keys->RES_key] = $keys->RES_Result_No;
+		$arr_response[$keys->ERR_key] = $keys->ERR_Add_Key_Already_Exist;
+		echo(json_encode($arr_response));
+		return;
+	}
+	
+	$res = getResultFromDataBase("INSERT INTO account (crypted_key, user_id) VALUES ('".$userInfos['id']."', '".$userInfos['crypted_key']."')");
 	
 	if($res == 0){
 		$arr_response[$keys->RES_key] = $keys->RES_Result_Yes;
-		echo(json_encode($arr_response));
 	} else if($res == -1){
 		$arr_response[$keys->RES_key] = $keys->RES_Result_No;
-		echo(json_encode($arr_response));
 	}
+	
+	echo(json_encode($arr_response));
 }
 
-function deleteUser($userInfos){
+function delete($userInfos){
 	$keys = new keys();
 
 	if(!isset($userInfos['id']))
 	{
 		displayDebugMsg("Error - Need a 'id' argment");
+		$arr_response[$keys->RES_key] = $keys->RES_Result_No;
 		$arr_response[$keys->ERR_key] = $keys->ERR_Bad_Arguments;
 		echo(json_encode($arr_response));
 		return;
 	}
 	
-	$jsonObj = getResultFromDataBase('SELECT * FROM user WHERE id = '.$userInfos['id'], 'auth');
+	$jsonObj = getResultFromDataBase('SELECT * FROM user WHERE id = '.$userInfos['id']);
 	
 	if($jsonObj == ""){
+		$arr_response[$keys->RES_key] = $keys->RES_Result_No;
 		$arr_response[$keys->ERR_key] = $keys->ERR_No_Result_Found;
 		echo(json_encode($arr_response));
 		return;
 	}
 
-	$res = getResultFromDataBase("DELETE FROM user WHERE id = ".$userInfos['id']."", 'auth');
+	$res = getResultFromDataBase("DELETE FROM user WHERE id = ".$userInfos['id']."", 'account');
 
 	if($res == 0){
 		$arr_response[$keys->RES_key] = $keys->RES_Result_Yes;
-		echo(json_encode($arr_response));
 	} else if($res == -1){
 		$arr_response[$keys->RES_key] = $keys->RES_Result_No;
-		echo(json_encode($arr_response));
 	}
+	
+	echo(json_encode($arr_response));
 }
 
-function modifyUser($userInfos){
+function modify($userInfos){
 	$keys = new keys();
 	var_dump($userInfos);
 
-	if(!isset($userInfos['id']))
+	if(		!isset($userInfos['id'])
+		||	!isset($userInfos['crypted_key']))
 	{
-		displayDebugMsg("Error - Need a 'id' argment");
+		displayDebugMsg("Error - Need a 'id' / 'crypted_key' argments");
+		$arr_response[$keys->RES_key] = $keys->RES_Result_No;
 		$arr_response[$keys->ERR_key] = $keys->ERR_Bad_Arguments;
 		echo(json_encode($arr_response));
 		return;
 	}
 
-	$jsonObj = getResultFromDataBase('SELECT * FROM user WHERE id = '.$userInfos['id'], 'auth');
+	$jsonObj = getResultFromDataBase('SELECT * FROM user WHERE id = '.$userInfos['id'], 'account');
 
 	if($jsonObj == ""){
+		$arr_response[$keys->RES_key] = $keys->RES_Result_No;
 		$arr_response[$keys->ERR_key] = $keys->ERR_No_Result_Found;
 		echo(json_encode($arr_response));
 		return;
 	}
-	
-	$strChamp = "";
-	$strValue = "";
-	$fisrt = true;
-	foreach ($userInfos as $key => $value){
-		if(		strcmp($key, 'first_name') == 0
-			||	strcmp($key, 'first_name') == 0
-			||	strcmp($key, 'first_name') == 0
-			|| 	strcmp($key, 'first_name') == 0
-			||	strcmp($key, 'first_name') == 0)
-		{
-			if($fisrt == true){
-				$strChamp .= $key.", ";
-				$strValue .= "'".$value."'";
-			} else {
-				$strChamp .= ", ".$key;
-				$strValue .= ", '".$value."'";
-			}
-		}
-	}
 
-	$res = getResultFromDataBase("", 'auth');
+	$res = getResultFromDataBase('UPDATE account SET crypted_key=\''. $userInfos['crypted_key'] .'\' WHERE user_id='. $userInfos['id'] .'');
 
 	if($res == 0){
 		$arr_response[$keys->RES_key] = $keys->RES_Result_Yes;
-		echo(json_encode($arr_response));
 	} else if($res == -1){
 		$arr_response[$keys->RES_key] = $keys->RES_Result_No;
-		echo(json_encode($arr_response));
 	}
+	
+	echo(json_encode($arr_response));
 }
+
 
 /**
  * Encrypting password
