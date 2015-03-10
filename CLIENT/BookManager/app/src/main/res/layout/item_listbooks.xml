@@ -1,45 +1,58 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
+
+<android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:card_view="http://schemas.android.com/apk/res-auto"
+    android:orientation="horizontal"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:layout_height="match_parent"
+    android:layout_margin="5dp"
+    card_view:cardCornerRadius="10dp"
+    card_view:cardElevation="5dp">
 
-    <ImageView
-        android:id="@+id/icon_item_bookList"
-        android:layout_width="100dp"
-        android:layout_height="100dp"
-        android:padding="5dp"
-        android:src="@drawable/book"/>
-
-    <TextView
-        android:id="@+id/title_item_bookList"
+    <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:orientation="vertical"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:padding="5dp"
-        android:layout_toEndOf="@+id/icon_item_bookList"
-        android:layout_toRightOf="@+id/icon_item_bookList"
-        android:textStyle="bold|italic"
-        android:text="@string/title"/>
+        android:layout_height="wrap_content">
+
+        <ImageView
+            android:id="@+id/icon_item_bookList"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:padding="5dp"
+            android:src="@drawable/book"/>
+
+        <TextView
+            android:id="@+id/title_item_bookList"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="5dp"
+            android:layout_toEndOf="@+id/icon_item_bookList"
+            android:layout_toRightOf="@+id/icon_item_bookList"
+            android:textStyle="bold|italic"
+            android:text="@string/title"/>
 
 
-    <TextView
-        android:id="@+id/author_item_bookList"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:padding="5dp"
-        android:layout_toEndOf="@+id/icon_item_bookList"
-        android:layout_toRightOf="@+id/icon_item_bookList"
-        android:layout_below="@+id/title_item_bookList"
-        android:text="@string/author"/>
+        <TextView
+            android:id="@+id/author_item_bookList"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="5dp"
+            android:layout_toEndOf="@+id/icon_item_bookList"
+            android:layout_toRightOf="@+id/icon_item_bookList"
+            android:layout_below="@+id/title_item_bookList"
+            android:text="@string/author"/>
 
 
-    <TextView
-        android:id="@+id/summary_item_bookList"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:padding="5dp"
-        android:layout_toEndOf="@+id/icon_item_bookList"
-        android:layout_toRightOf="@+id/icon_item_bookList"
-        android:layout_below="@+id/author_item_bookList"/>
-</RelativeLayout>
+        <TextView
+            android:id="@+id/summary_item_bookList"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:padding="5dp"
+            android:layout_toEndOf="@+id/icon_item_bookList"
+            android:layout_toRightOf="@+id/icon_item_bookList"
+            android:layout_below="@+id/author_item_bookList"/>
+
+    </RelativeLayout>
+
+</android.support.v7.widget.CardView>

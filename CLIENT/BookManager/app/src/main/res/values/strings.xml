@@ -16,8 +16,21 @@
     <string name="firstName">First name</string>
     <string name="lastName">Last name</string>
     <string name="birthDate">Birth date</string>
+    <string name="mail">E mail</string>
     <string name="date">Date</string>
     <string name="choose">Choose</string>
-    <string name="waitingToBeSet">Waiting to be set...</string>
+    <string name="waitingToBeSet">Waiting to be set…</string>
+    <string name="typeMail">Type your mail</string>
+    <string name="ok">OK</string>
+    <string name="errorNetWork">An error occurred. Sorry. Please, try again.</string>
+    <string name="loginError">Your login must be at least 3 characters long.</string>
+    <string name="passwordError">Your password must be at least 8 characters long.</string>
+    <string name="mailError">This is not an email address.</string>
+    <string name="title_activity_book_details">BookDetailsActivity</string>
+    <string name="isbn">ISBN</string>
+    <string name="summary">Summary</string>
+    <string name="title_activity_navigation">NavigationActivity</string>
+    <string name="drawer_open">Open</string>
+    <string name="drawer_close">Close</string>
 
 </resources>

@@ -33,7 +33,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:inputType="textEmailAddress"
-            android:text="aa@bb.com"/>
+            android:hint="@string/mail"/>
 
         <TextView
             android:layout_width="match_parent"
@@ -45,7 +45,8 @@
             android:id="@+id/password"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:inputType="textPassword"/>
+            android:inputType="textPassword"
+            android:hint="@string/password"/>
 
     </LinearLayout>
 

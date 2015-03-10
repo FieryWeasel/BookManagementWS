@@ -26,6 +26,14 @@
             android:name=".view.SignInActivity"
             android:label="@string/title_activity_sign_in" >
         </activity>
+        <activity
+            android:name=".view.BookDetailsActivity"
+            android:label="@string/title_activity_book_details" >
+        </activity>
+        <activity
+            android:name=".view.NavigationActivity"
+            android:label="@string/title_activity_navigation" >
+        </activity>
     </application>
 
 </manifest>

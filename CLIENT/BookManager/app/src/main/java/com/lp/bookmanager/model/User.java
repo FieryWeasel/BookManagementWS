@@ -13,8 +13,8 @@ public class User {
     public User() {
     }
 
-    public User(int user_id, String first_name, String last_name, String nickname, String birth_date, String mail) {
-        this.user_id = user_id;
+    public User(String first_name, String last_name, String nickname, String birth_date, String mail) {
+        this.user_id = -1;
         this.first_name = first_name;
         this.last_name = last_name;
         this.nickname = nickname;

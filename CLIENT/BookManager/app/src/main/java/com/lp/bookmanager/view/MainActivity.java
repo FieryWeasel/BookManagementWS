@@ -1,38 +1,22 @@
 package com.lp.bookmanager.view;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
-import android.os.AsyncTask;
 import android.os.Bundle;
-import android.text.method.CharacterPickerDialog;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ImageView;
 
-import com.android.volley.Request;
-import com.android.volley.RequestQueue;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.VolleyLog;
-import com.android.volley.toolbox.JsonObjectRequest;
-import com.android.volley.toolbox.Volley;
-import com.google.gson.Gson;
 import com.lp.bookmanager.R;
-import com.lp.bookmanager.model.User;
+import com.lp.bookmanager.model.Account;
 import com.lp.bookmanager.tools.Constants;
-import com.lp.bookmanager.tools.JsonLoader;
-
-import org.json.JSONObject;
-
-import java.io.IOException;
-import java.util.List;
+import com.lp.bookmanager.tools.network.NetworkRequests;
 
 
-public class MainActivity extends Activity {
+public class MainActivity extends Activity implements NetworkRequests.ConnectionListener {
 
     private EditText etLogin;
     private EditText etPassword;
@@ -45,22 +29,22 @@ public class MainActivity extends Activity {
         etLogin =  (EditText)findViewById(R.id.login);
         etPassword = (EditText)findViewById(R.id.password);
 
-        ((Button)findViewById(R.id.login_validate)).setOnClickListener(new View.OnClickListener() {
+        (findViewById(R.id.login_validate)).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                User user = new User();
+
                 String login = etLogin.getText().toString();
                 String password = etPassword.getText().toString();
-                user.setNickname(login);
-                connect(user);
+                NetworkRequests.connect(MainActivity.this, Account.getCryptedfkey(password, login), MainActivity.this);
+
             }
         });
 
-        ((Button)findViewById(R.id.signIn)).setOnClickListener(new View.OnClickListener() {
+        (findViewById(R.id.signIn)).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(MainActivity.this, SignInActivity.class);
-                startActivity(intent);
+                startActivityForResult(intent, Constants.SIGN_IN_SUCCESSFUL);
             }
         });
     }
@@ -84,47 +68,33 @@ public class MainActivity extends Activity {
         return super.onOptionsItemSelected(item);
     }
 
-    private void connect(final User user){
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
 
-        RequestQueue queue = Volley.newRequestQueue(this);
+        if( resultCode == RESULT_OK && requestCode == Constants.SIGN_IN_SUCCESSFUL){
+            Intent intent = new Intent(MainActivity.this, ListBookActivity.class);
+            startActivity(intent);
+            finish();
+        }
+    }
 
-        JsonObjectRequest jsonObjReq = new JsonObjectRequest(Request.Method.GET,
-                Constants.URL_AUTH + "isExist/user/" + user.getNickname(), null,
-                new Response.Listener<JSONObject>() {
+    @Override
+    public void onConnectionSucceeded() {
+        Intent intent = new Intent(MainActivity.this, ListBookActivity.class);
+        startActivity(intent);
+    }
 
-                    @Override
-                    public void onResponse(JSONObject response) {
-                        Log.d("RESPONSE", response.toString());
-                    }
-                }, new Response.ErrorListener() {
-
+    @Override
+    public void onConnectionFailed() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+        builder.setMessage("Error, please try again");
+        builder.setNeutralButton("Ok", new DialogInterface.OnClickListener() {
             @Override
-            public void onErrorResponse(VolleyError error) {
-                error.printStackTrace();
-                Log.d("ERROR_RESPONSE", error.toString());
+            public void onClick(DialogInterface dialogInterface, int i) {
+                dialogInterface.dismiss();
             }
         });
-
-        queue.add(jsonObjReq);
-
-//        if(user != null) {
-//            new AsyncTask<Void, Void, Void>() {
-//                @Override
-//                protected Void doInBackground(Void... voids) {
-//                    String url = Constants.URL_AUTH + "isExist/user/" + user.getNickname();
-//                    String userJson = null;
-//                    try {
-//                        userJson = JsonLoader.loadJson("GET", url);
-//                    } catch (IOException e) {
-//                        e.printStackTrace();
-//                    }
-//                    Log.d("USER", userJson);
-//                    return null;
-//                }
-//            }.execute();
-//        }else{
-//
-//        }
-
+        builder.create().show();
     }
 }
