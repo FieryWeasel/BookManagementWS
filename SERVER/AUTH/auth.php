@@ -1,35 +1,40 @@
 <?php
-include_once 'conectdb.php';
+include_once '../conectdb.php';
 include_once '../debug.php';
 include_once '../keys.php';
 
-$array = explode('/', $_SERVER['REQUEST_URI']);
 
-$name_function = "";
-if(isset($array[3]) ){
-	$name_function = $array[3];
-}
+$name = explode('auth.php', $_SERVER['REQUEST_URI']);
+if(isset($name[1]) ){
+	$array = explode('/', $name[1]);
 
-if( isset($array[2]) && $array[2] == "user"){
-switch ($name_function){
-	case "isExist":
-		isExist($_POST);
-		break;
-	case "canConnect":
-		canConnect($_POST);
-		break;
-	case "add":
-		add($_POST);
-		break;
-	case "modify":
-		modify($_POST);
-	case "delete":
-		delete($_POST);
-		break;
-	default:
-		?>No function to launch<br/><?php
-		break;
-}
+	$name_function = "";
+	if(isset($array[2]) ){
+		$name_function = $array[2];
+	}
+
+	if( isset($array[1]) && $array[1] == "user"){
+	switch ($name_function){
+		case "isExist":
+			isExist($_POST);
+			break;
+		case "canConnect":
+			canConnect($_POST);
+			break;
+		case "add":
+			add($_POST);
+			break;
+		case "modify":
+			modify($_POST);
+			break;
+		case "delete":
+			delete($_POST);
+			break;
+		default:
+			?>No function to launch<br/><?php
+			break;
+		}
+	}
 }
 
 function isExist($connectInfos) {
@@ -44,7 +49,7 @@ function isExist($connectInfos) {
 	}
 		
 	// Request into the BDD
-	$jsonObj = getResultFromDataBase('SELECT * FROM user WHERE id='. $connectInfos['id'] .'', 'auth');
+	$jsonObj = getResultFromDataBase('SELECT * FROM user WHERE id='. $connectInfos['id'] .'');
 	
 	if($jsonObj == ""){
 		$arr_response[$keys->RES_key] = $keys->RES_Result_No;
@@ -60,21 +65,23 @@ function isExist($connectInfos) {
 function canConnect($userInfos){
 	$keys = new keys();
 	
-	if(		!isset($userInfos['id']) 
-		|| 	!isset($userInfos['crypted_key'])){
-		displayDebugMsg("Error - Need a 'user_id' and a 'cryted_key'");
+	if(!isset($userInfos["crypted_key"])){
+		displayDebugMsg("Error - Need a 'cryted_key'");
 		$arr_response[$keys->RES_key] = $keys->RES_Result_No;
 		$arr_response[$keys->ERR_key] = $keys->ERR_Bad_Arguments;
+		$arr_response["crypted_key"] = $userInfos["crypted_key"];
 		echo(json_encode($arr_response));
 		return;
 	}
 	
-	$jsonObj = getResultFromDataBase('SELECT * FROM account WHERE user_id = '. $userInfos['id'] .' AND  crypted_key = '. $userInfos['crypted_key'] .'', 'auth');
-	
+	$jsonObj = getResultFromDataBase('SELECT * FROM account WHERE crypted_key LIKE \''. $userInfos["crypted_key"] .'\'');
+		
 	if($jsonObj == ""){
 		$arr_response[$keys->RES_key] = $keys->RES_Result_No;
+		$arr_response["crypted_key"] = $userInfos["crypted_key"];
 	} else {
 		$arr_response[$keys->RES_key] = $keys->RES_Result_Yes;
+		$arr_response["id"] = $jsonObj[0]["user_id"];
 	}
 	
 	echo(json_encode($arr_response));
@@ -93,7 +100,7 @@ function add($userInfos){
 		return;
 	}
 	
-	$jsonObj = getResultFromDataBase('SELECT * FROM user WHERE id = '.$userInfos['id'], 'auth');
+	$jsonObj = getResultFromDataBase('SELECT * FROM user WHERE id = '.$userInfos['id']);
 	
 	if($jsonObj != ""){
 		$arr_response[$keys->RES_key] = $keys->RES_Result_No;
@@ -102,7 +109,7 @@ function add($userInfos){
 		return;
 	}
 	
-	$res = getResultFromDataBase("INSERT INTO account (crypted_key, user_id) VALUES ('".$userInfos['id']."', '".$userInfos['crypted_key']."')", 'auth');
+	$res = getResultFromDataBase("INSERT INTO account (crypted_key, user_id) VALUES ('".$userInfos['id']."', '".$userInfos['crypted_key']."')");
 	
 	if($res == 0){
 		$arr_response[$keys->RES_key] = $keys->RES_Result_Yes;
@@ -125,7 +132,7 @@ function delete($userInfos){
 		return;
 	}
 	
-	$jsonObj = getResultFromDataBase('SELECT * FROM user WHERE id = '.$userInfos['id'], 'auth');
+	$jsonObj = getResultFromDataBase('SELECT * FROM user WHERE id = '.$userInfos['id']);
 	
 	if($jsonObj == ""){
 		$arr_response[$keys->RES_key] = $keys->RES_Result_No;
@@ -134,7 +141,7 @@ function delete($userInfos){
 		return;
 	}
 
-	$res = getResultFromDataBase("DELETE FROM user WHERE id = ".$userInfos['id']."", 'auth');
+	$res = getResultFromDataBase("DELETE FROM user WHERE id = ".$userInfos['id']."", 'account');
 
 	if($res == 0){
 		$arr_response[$keys->RES_key] = $keys->RES_Result_Yes;
@@ -159,7 +166,7 @@ function modify($userInfos){
 		return;
 	}
 
-	$jsonObj = getResultFromDataBase('SELECT * FROM user WHERE id = '.$userInfos['id'], 'auth');
+	$jsonObj = getResultFromDataBase('SELECT * FROM user WHERE id = '.$userInfos['id'], 'account');
 
 	if($jsonObj == ""){
 		$arr_response[$keys->RES_key] = $keys->RES_Result_No;
@@ -168,7 +175,7 @@ function modify($userInfos){
 		return;
 	}
 
-	$res = getResultFromDataBase('UPDATE account SET crypted_key=\''. $userInfos['crypted_key'] .'\' WHERE user_id='. $userInfos['id'] .'', 'auth');
+	$res = getResultFromDataBase('UPDATE account SET crypted_key=\''. $userInfos['crypted_key'] .'\' WHERE user_id='. $userInfos['id'] .'');
 
 	if($res == 0){
 		$arr_response[$keys->RES_key] = $keys->RES_Result_Yes;
