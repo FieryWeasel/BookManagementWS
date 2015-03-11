@@ -10,7 +10,7 @@ function get($connectInfos) {
 	$strFinal = "";
 	$isFirstElement = true;
 	foreach ($connectInfos as $key => $value){
-		if(strcmp($key, 'isbn') == 0 || strcmp($key, 'title') == 0 || strcmp($key, 'summary') == 0){
+		if(strcmp($key, 'book_id') == 0 || strcmp($key, 'comment') == 0){
 			if($isFirstElement){
 					$strFinal .= 'WHERE ';
 			}
@@ -20,7 +20,7 @@ function get($connectInfos) {
 			$strFinal .= 'UPPER('.$key . ')=UPPER(\'' . $value . '\')';
 			$isFirstElement = false;
 		}
-		if(strcmp($key, 'type_id') == 0 || strcmp($key, 'author_id') == 0){
+		if(strcmp($key, 'id') == 0 || strcmp($key, 'user_id') == 0 || strcmp($key, 'mark') == 0){
 			if($isFirstElement){
 					$strFinal .= 'WHERE ';
 			}
@@ -33,14 +33,14 @@ function get($connectInfos) {
 	}
 	
 	// Try to get the informations about book
-	$jsonObj = getResultFromDataBase('SELECT * FROM book '. $strFinal);
+	$jsonObj = getResultFromDataBase('SELECT * FROM review '. $strFinal);
 
 	if($jsonObj == ""){
 		$arr_response[$keys->RES_key] = $keys->RES_Result_No;
 		$arr_response[$keys->ERR_key] = $keys->ERR_No_Result_Found;
 	} else {
 		$arr_response[$keys->RES_key] = $keys->RES_Result_Yes;
-		$arr_response['books'] = $jsonObj;
+		$arr_response['reviews'] = $jsonObj;
 	}
 	
 	echo(json_encode($arr_response));
@@ -50,32 +50,22 @@ function add($connectInfos){
 	$keys = new keys();
 	
 	// Verify informations about the request
-	if(		!isset($connectInfos['isbn'])
-		||	!isset($connectInfos['title'])
-		||	!isset($connectInfos['type_id'])
-		|| 	!isset($connectInfos['author_id'])
-		||	!isset($connectInfos['summary']))
+	if(		!isset($connectInfos['book_id'])
+		||	!isset($connectInfos['user_id'])
+		||	!isset($connectInfos['mark'])
+		|| 	!isset($connectInfos['comment']))
 	{
-		displayDebugMsg("Error - Need a 'isbn' / 'title' / 'type_id' / 'author_id' / 'summary' argments");
+		displayDebugMsg("Error - Need a 'book_id' / 'user_id' / 'mark' / 'comment' argments");
 		$arr_response[$keys->RES_key] = $keys->RES_Result_No;
 		$arr_response[$keys->ERR_key] = $keys->ERR_Bad_Arguments;
 		echo(json_encode($arr_response));
 		return;
 	}
 	
-	$jsonObj = getResultFromDataBase('SELECT * FROM book WHERE UPPER(isbn) LIKE UPPER("'.$connectInfos['isbn'].'")');
-	
-	if($jsonObj != ""){
-		$arr_response[$keys->RES_key] = $keys->RES_Result_No;
-		$arr_response[$keys->ERR_key] = $keys->ERR_Add_Key_Already_Exist;
-		echo(json_encode($arr_response));
-		return;
-	}
-	
 	// Try to add a book on the table book
-	$res = getResultFromDataBase('INSERT INTO book (isbn, title, type_id, author_id, summary) VALUES ("'.$connectInfos['isbn'].'", "'.$connectInfos['title'].'", "'.$connectInfos['type_id'].'", "'.$connectInfos['author_id'].'", "'.$connectInfos['summary'].'")');
+	$res = getResultFromDataBase('INSERT INTO review (book_id, user_id, mark, comment) VALUES ("'. $connectInfos['book_id'] .'", '. $connectInfos['user_id'] .', '. $connectInfos['mark'] .', "'. $connectInfos['comment'] .'")');
 	
-	$jsonObj = getResultFromDataBase('SELECT * FROM book WHERE UPPER(isbn) LIKE UPPER("'.$connectInfos['isbn'].'")');
+	$jsonObj = getResultFromDataBase('SELECT * FROM review ORDER BY id DESC LIMIT 1');
 	
 	if($jsonObj == ""){
 		$arr_response[$keys->RES_key] = $keys->RES_Result_No;
@@ -91,16 +81,16 @@ function delete($connectInfos){
 	$keys = new keys();
 
 	// Verify informations about the request
-	if(!isset($connectInfos['isbn']))
+	if(!isset($connectInfos['id']))
 	{
-		displayDebugMsg("Error - Need a 'isbn' argment");
+		displayDebugMsg("Error - Need a 'id' argment");
 		$arr_response[$keys->RES_key] = $keys->RES_Result_No;
 		$arr_response[$keys->ERR_key] = $keys->ERR_Bad_Arguments;
 		echo(json_encode($arr_response));
 		return;
 	}
 	
-	$jsonObj = getResultFromDataBase('SELECT * FROM book WHERE UPPER(isbn) LIKE UPPER("'.$connectInfos['isbn'].'")');
+	$jsonObj = getResultFromDataBase('SELECT * FROM review WHERE id='. $connectInfos['id']);
 	if($jsonObj == ""){
 		$arr_response[$keys->RES_key] = $keys->RES_Result_No;
 		$arr_response[$keys->ERR_key] = $keys->ERR_No_Result_Found;
@@ -109,9 +99,9 @@ function delete($connectInfos){
 	}
 
 	// Try to delete a book on the table book
-	$res = getResultFromDataBase('DELETE FROM book WHERE UPPER(isbn) LIKE UPPER("'.$connectInfos['isbn'].'")');
+	$res = getResultFromDataBase('DELETE FROM review WHERE id='. $connectInfos['id']);
 
-	$jsonObj = getResultFromDataBase('SELECT * FROM book WHERE UPPER(isbn) LIKE UPPER("'.$connectInfos['isbn'].'")');
+	$jsonObj = getResultFromDataBase('SELECT * FROM review WHERE id='. $connectInfos['id']);
 	if($jsonObj != ""){
 		$arr_response[$keys->RES_key] = $keys->RES_Result_No;
 		$arr_response[$keys->ERR_key] = $keys->ERR_Value_Cannot_Be_Modify;
@@ -126,19 +116,19 @@ function modify($connectInfos){
 	$keys = new keys();
 
 	// Verify informations about the request
-	if(	!isset($connectInfos['isbn']))
+	if(	!isset($connectInfos['id']))
 	{
-		displayDebugMsg("Error - Need a 'isbn' argment");
+		displayDebugMsg("Error - Need a 'id' argment");
 		$arr_response[$keys->RES_key] = $keys->RES_Result_No;
 		$arr_response[$keys->ERR_key] = $keys->ERR_Bad_Arguments;
 		echo(json_encode($arr_response));
 		return;
 	}
 
-	$jsonObj = getResultFromDataBase('SELECT * FROM book WHERE UPPER(isbn) = UPPER("'.$connectInfos['isbn'].'")');
+	$jsonObj = getResultFromDataBase('SELECT * FROM review WHERE id='. $connectInfos['id']);
 
 	if($jsonObj == ""){
-		displayDebugMsg("Error - No book with this 'isbn' found");
+		displayDebugMsg("Error - No review with this 'id' found");
 		$arr_response[$keys->RES_key] = $keys->RES_Result_No;
 		$arr_response[$keys->ERR_key] = $keys->ERR_No_Result_Found;
 		echo(json_encode($arr_response));
@@ -149,13 +139,13 @@ function modify($connectInfos){
 	$strFinal = "";
 	$isFirstElement = true;
 	foreach ($connectInfos as $key => $value){
-		if(strcmp($key, 'title') == 0 || strcmp($key, 'summary') == 0){
+		if(strcmp($key, 'book_id') == 0 || strcmp($key, 'comment') == 0){
 			if(!$isFirstElement){
 					$strFinal .= ',';
 			}
 			$strFinal .= $key . '=\'' . $value . '\'';
 			$isFirstElement = false;
-		} else if(strcmp($key, 'type_id') == 0 || (strcmp($key, 'author_id') == 0)){
+		} else if((strcmp($key, 'user_id') == 0 || strcmp($key, 'mark') == 0)){
 			if(!$isFirstElement){
 					$strFinal .= ',';
 			}
@@ -164,9 +154,9 @@ function modify($connectInfos){
 		}
 	}
 	
-	// Try to modify the value in user table and account table if needed
+	// Try to modify the value in review table if needed
 	if(strcmp($strFinal, "") != 0){
-		$res = getResultFromDataBase('UPDATE book SET '. $strFinal .' WHERE UPPER(isbn) = UPPER("'. $connectInfos['isbn'] .'")');
+		$res = getResultFromDataBase('UPDATE review SET '. $strFinal .' WHERE id='. $connectInfos['id']);
 
 		if($res == 0){
 			$arr_response[$keys->RES_key] = $keys->RES_Result_Yes;

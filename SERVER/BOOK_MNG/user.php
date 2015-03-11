@@ -3,52 +3,37 @@ include_once '../conectdb.php';
 include_once '../debug.php';
 include_once '../keys.php';
 
-$name = explode('user.php', $_SERVER['REQUEST_URI']);
-if(isset($name[1]) ){
-	$array = explode('/', $name[1]);
-
-	$name_function = "";
-	if(isset($array[2]) ){
-		$name_function = $array[2];
-	}
-
-	if( isset($array[1]) && $array[1] == "user"){
-	switch ($name_function){
-		case "get":
-			get($_POST);
-			break;
-		case "add":
-			add($_POST);
-			break;
-		case "modify":
-			modify($_POST);
-			break;
-		case "delete":
-			delete($_POST);
-			break;
-		default:
-			?>No function to launch<br/><?php
-			break;
-		}
-	}
-}
-
 function get($connectInfos) {
 	$keys = new keys();
 	
-	// Todo : Change the parameter to be optional (Get all User)
-	
-	// Verify informations about the request
-	if(!isset($connectInfos['id'])){
-		displayDebugMsg("Error - Need a 'user_id'");
-		$arr_response[$keys->RES_key] = $keys->RES_Result_No;
-		$arr_response[$keys->ERR_key] = $keys->ERR_Bad_Arguments;
-		echo(json_encode($arr_response));
-		return;
+	// Try to build the SELECT request arguments
+	$strFinal = "";
+	$isFirstElement = true;
+	foreach ($connectInfos as $key => $value){
+		if(strcmp($key, 'first_name') == 0 || strcmp($key, 'last_name') == 0 || strcmp($key, 'nickname') == 0 || strcmp($key, 'birth_date') == 0 || strcmp($key, 'email') == 0){
+			if($isFirstElement){
+					$strFinal .= 'WHERE ';
+			}
+			if(!$isFirstElement){
+					$strFinal .= ' AND ';
+			}
+			$strFinal .= 'UPPER('.$key . ')=UPPER(\'' . $value . '\')';
+			$isFirstElement = false;
+		}
+		if(strcmp($key, 'id') == 0 ){
+			if($isFirstElement){
+					$strFinal .= 'WHERE ';
+			}
+			if(!$isFirstElement){
+					$strFinal .= ' AND ';
+			}
+			$strFinal .= $key . '=' . $value . '';
+			$isFirstElement = false;
+		}
 	}
 	
 	// Try to get the informations about user
-	$jsonObj = getResultFromDataBase('SELECT * FROM user WHERE id='. $connectInfos['id'] .'');
+	$jsonObj = getResultFromDataBase('SELECT * FROM user '. $strFinal);
 	
 	if($jsonObj == ""){
 		$arr_response[$keys->RES_key] = $keys->RES_Result_No;
@@ -73,6 +58,7 @@ function add($connectInfos){
 		||	!isset($connectInfos['crypted_key']))
 	{
 		displayDebugMsg("Error - Need a 'first_name' / 'last_name' / 'nickname' / 'birth_date' / 'email' / 'crypted_key' arguments");
+		$arr_response[$keys->RES_key] = $keys->RES_Result_No;
 		$arr_response[$keys->ERR_key] = $keys->ERR_Bad_Arguments;
 		echo(json_encode($arr_response));
 		return;
@@ -114,6 +100,7 @@ function delete($connectInfos){
 	if(!isset($connectInfos['id']))
 	{
 		displayDebugMsg("Error - Need a 'id' argument");
+		$arr_response[$keys->RES_key] = $keys->RES_Result_No;
 		$arr_response[$keys->ERR_key] = $keys->ERR_Bad_Arguments;
 		echo(json_encode($arr_response));
 		return;
@@ -122,6 +109,7 @@ function delete($connectInfos){
 	$jsonObj = getResultFromDataBase('SELECT * FROM user WHERE id = '.$connectInfos['id']);
 	
 	if($jsonObj == ""){
+		$arr_response[$keys->RES_key] = $keys->RES_Result_No;
 		$arr_response[$keys->ERR_key] = $keys->ERR_No_Result_Found;
 		echo(json_encode($arr_response));
 		return;
@@ -139,7 +127,17 @@ function delete($connectInfos){
 		$jsonObj = getResultFromDataBase('SELECT * FROM account WHERE user_id='. $connectInfos['id'] .'');
 		
 		if($jsonObj == ""){
-			$arr_response[$keys->RES_key] = $keys->RES_Result_Yes;
+			// Try to delete the user's reviews on the table review
+			$res = getResultFromDataBase("DELETE FROM review WHERE user_id = ".$connectInfos['id']."");
+		
+			$jsonObj = getResultFromDataBase('SELECT * FROM review WHERE user_id='. $connectInfos['id'] .'');
+		
+			if($jsonObj == ""){
+				$arr_response[$keys->RES_key] = $keys->RES_Result_Yes;
+			} else {
+				$arr_response[$keys->RES_key] = $keys->RES_Result_No;
+				$arr_response[$keys->ERR_key] = $keys->ERR_Value_Cannot_Be_Modify;
+			}
 		} else {
 			$arr_response[$keys->RES_key] = $keys->RES_Result_No;
 			$arr_response[$keys->ERR_key] = $keys->ERR_Value_Cannot_Be_Modify;
