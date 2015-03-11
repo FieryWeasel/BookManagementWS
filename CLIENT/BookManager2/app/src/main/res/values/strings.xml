@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">BookManager</string>
+    <string name="hello_world">Hello world!</string>
+    <string name="action_settings">Settings</string>
+    <string name="title">Title</string>
+    <string name="author">Author</string>
+    <string name="title_activity_list_book">ListBookActivity</string>
+    <string name="login">Login :</string>
+    <string name="password">Password</string>
+    <string name="validate">Validate</string>
+    <string name="title_activity_sign_in">SignInActivity</string>
+    <string name="signIn">Sign In</string>
+    <string name="nickname">Pseudo</string>
+    <string name="firstName">First name</string>
+    <string name="lastName">Last name</string>
+    <string name="birthDate">Birth date</string>
+    <string name="mail">E mail</string>
+    <string name="date">Date</string>
+    <string name="choose">Choose</string>
+    <string name="waitingToBeSet">Waiting to be set…</string>
+    <string name="typeMail">Type your mail</string>
+    <string name="ok">OK</string>
+    <string name="errorNetWork">An error occurred. Sorry. Please, try again.</string>
+    <string name="loginError">Your login must be at least 3 characters long.</string>
+    <string name="passwordError">Your password must be at least 8 characters long.</string>
+    <string name="mailError">This is not an email address.</string>
+    <string name="title_activity_book_details">BookDetailsActivity</string>
+    <string name="isbn">ISBN</string>
+    <string name="summary">Summary</string>
+    <string name="title_activity_navigation">NavigationActivity</string>
+    <string name="drawer_open">Open</string>
+    <string name="drawer_close">Close</string>
+    <string name="wait">Please wait...</string>
+    <string name="authenticating">Authenticating...</string>
+    <string name="action_sync">Sync</string>
+
+</resources>

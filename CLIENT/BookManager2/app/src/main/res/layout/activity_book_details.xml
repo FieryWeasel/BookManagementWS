@@ -1,0 +1,81 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
+    android:layout_height="match_parent" android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    tools:context="com.lp.bookmanager.view.BookDetailsActivity">
+
+    <android.support.v7.widget.CardView
+        xmlns:card_view="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/card_book_detail"
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="5dp"
+        card_view:cardCornerRadius="10dp"
+        card_view:cardElevation="5dp">
+
+        <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <ImageView
+                android:id="@+id/icon_book_detail"
+                android:layout_width="100dp"
+                android:layout_height="100dp"
+                android:padding="5dp"
+                android:src="@drawable/book"/>
+
+            <TextView
+                android:id="@+id/title_book_detail"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="5dp"
+                android:layout_toEndOf="@+id/icon_book_detail"
+                android:layout_toRightOf="@+id/icon_book_detail"
+                android:textStyle="bold|italic"
+                android:text="@string/title"/>
+
+            <TextView
+                android:id="@+id/author_book_detail"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="5dp"
+                android:layout_toEndOf="@+id/icon_book_detail"
+                android:layout_toRightOf="@+id/icon_book_detail"
+                android:layout_below="@+id/title_book_detail"
+                android:text="@string/author"/>
+
+            <TextView
+                android:id="@+id/isbn_book_detail"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="5dp"
+                android:layout_toEndOf="@+id/icon_book_detail"
+                android:layout_toRightOf="@+id/icon_book_detail"
+                android:layout_below="@+id/author_book_detail"
+                android:text="@string/isbn"/>
+
+            <TextView
+                android:id="@+id/summary_book_detail"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="5dp"
+                android:layout_below="@+id/icon_book_detail"
+                android:text="@string/summary"/>
+
+        </RelativeLayout>
+
+    </android.support.v7.widget.CardView>
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/listReviews"
+        android:scrollbars="vertical"
+        android:layout_below="@+id/card_book_detail"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="@dimen/activity_vertical_margin"/>
+
+</RelativeLayout>
