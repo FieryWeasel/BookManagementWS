@@ -1,9 +1,4 @@
 <?php
-
-function needRest(){
-	return false;
-}
-
 function needDebugMsg(){
 	return false;
 }
