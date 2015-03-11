@@ -3,15 +3,12 @@ package com.lp.bookmanager.tools.network;
 import android.content.Context;
 import android.util.Log;
 
-import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
-import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
-import com.android.volley.toolbox.JsonObjectRequest;
-import com.android.volley.toolbox.Volley;
 import com.lp.bookmanager.tools.Constants;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -25,13 +22,11 @@ public class NetworkRequests {
 
     public static void connect(Context context, String key, final ConnectionListener listener){
 
-        //TODO test and complete with async/result return
-        RequestQueue queue = Volley.newRequestQueue(context);
 
         Map<String, String> params = new HashMap<String, String>();
         params.put("crypted_key", key);
 
-        CustomRequest request = new CustomRequest(Request.Method.POST,
+        ObjectRequest request = new ObjectRequest(Request.Method.POST,
                 Constants.URL_BASE + Constants.URL_AUTH + "user/canConnect/", params,
                 new Response.Listener<JSONObject>() {
                     @Override
@@ -39,7 +34,8 @@ public class NetworkRequests {
                         Log.d("RESPONSE", response.toString());
                         try {
                             if(response.getString("response").equalsIgnoreCase("YES")){
-                                listener.onConnectionSucceeded();
+                                //response.getString("id")
+                                listener.onConnectionSucceeded("");
                             }else {
                                 listener.onConnectionFailed();
                             }
@@ -55,43 +51,78 @@ public class NetworkRequests {
                         Log.d("ERROR_RESPONSE", error.toString());
                     }
         });
+        addRequestToQueue(context, request);
+    }
 
-//        JsonObjectRequest jsonObjReq = new JsonObjectRequest(Request.Method.POST,
-//                Constants.URL_BASE + Constants.URL_AUTH + "user/canConnect/", new JSONObject(params),
-//                new Response.Listener<JSONObject>() {
-//                    @Override
-//                    public void onResponse(JSONObject response) {
-//                        Log.d("RESPONSE", response.toString());
-//                        try {
-//                            if(response.getString("response").equalsIgnoreCase("YES")){
-//                                listener.onConnectionSucceeded();
-//                            }else {
-//                                listener.onConnectionFailed();
-//                            }
-//                        } catch (JSONException e) {
-//                            e.printStackTrace();
-//                        }
-//                    }
-//                },
-//                new Response.ErrorListener() {
-//                    @Override
-//                    public void onErrorResponse(VolleyError error) {
-//                        error.printStackTrace();
-//                        Log.d("ERROR_RESPONSE", error.toString());
-//                    }
-//        }){
-//
-//            @Override
-//            public Map<String, String> getHeaders() throws AuthFailureError {
-//                HashMap<String, String> headers = new HashMap<String, String>();
-//                headers.put("Accept", "application/json");
-//                headers.put("Content-type", "application/json");
-//                return headers;
-//            }
-//        };
+    public static void getUSerInfo(Context context, String userId, final UserInfoListener listener){
 
+        //TODO Update with WS
+        Map<String, String> params = new HashMap<String, String>();
+        params.put("userId", userId);
+
+        ObjectRequest request = new ObjectRequest(Request.Method.POST,
+                Constants.URL_BASE + Constants.URL_USER_INFO + "user/canConnect/", params,
+                new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        Log.d("RESPONSE", response.toString());
+                        try {
+                            if(response.getString("response").equalsIgnoreCase("YES")){
+                                //response.getString("id")
+                                //TODO get User
+                                listener.onUserInfoCorrectlyRetrieved("");
+                            }else {
+                                listener.onFailToRetrieveUserInfo();
+                            }
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        error.printStackTrace();
+                        Log.d("ERROR_RESPONSE", error.toString());
+                    }
+                });
+        addRequestToQueue(context, request);
+    }
+
+    private static void addRequestToQueue(Context context,  Request request){
         NetworkData.getInstance().addToRequestQueue(context, request);
+    }
 
+    public static void GetBookList(Context context, final BookListListener listener) {
+        //TODO Update with WS
+
+        ArrayRequest request = new ArrayRequest(Request.Method.GET,
+                Constants.URL_BASE + Constants.URL_USER_INFO + "user/canConnect/", null,
+                new Response.Listener<JSONArray>() {
+                    @Override
+                    public void onResponse(JSONArray response) {
+                        Log.d("RESPONSE", response.toString());
+                        try {
+                            if(response.getString(0).equalsIgnoreCase("YES")){
+                                //response.getString("id")
+                                //TODO get list
+                                listener.onBookListRetrieved("");
+                            }else {
+                                listener.onFailToRetrieveBookList();
+                            }
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        error.printStackTrace();
+                        Log.d("ERROR_RESPONSE", error.toString());
+                    }
+                });
+        addRequestToQueue(context, request);
     }
 
 //    //TODO Maybe later
@@ -120,8 +151,18 @@ public class NetworkRequests {
 //    }
 
     public interface ConnectionListener{
-        public void onConnectionSucceeded();
+        public void onConnectionSucceeded(String userId);
         public void onConnectionFailed();
+    }
+
+    public interface UserInfoListener{
+        public void onUserInfoCorrectlyRetrieved(String jsonUser);
+        public void onFailToRetrieveUserInfo();
+    }
+
+    public interface BookListListener{
+        public void onBookListRetrieved(String jsonUser);
+        public void onFailToRetrieveBookList();
     }
 
 

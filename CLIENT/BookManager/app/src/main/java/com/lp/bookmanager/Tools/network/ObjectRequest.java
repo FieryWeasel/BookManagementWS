@@ -15,19 +15,21 @@ import java.util.Map;
 /**
  * Created by iem on 10/03/15.
  */
-public class CustomRequest extends Request<JSONObject> {
+public class ObjectRequest extends Request<JSONObject> {
     private Response.Listener<JSONObject> listener;
     private Map<String, String> params;
 
-    public CustomRequest(String url, Map<String, String> params, Response.Listener<JSONObject> responseListener, Response.ErrorListener errorListener) {
+
+
+    public ObjectRequest(String url, Map<String, String> params, Response.Listener<JSONObject> responseListener, Response.ErrorListener errorListener) {
         super(Method.GET, url, errorListener);
         this.listener = responseListener;
         this.params = params;
     }
 
-    public CustomRequest(int method, String url, Map<String, String> params, Response.Listener<JSONObject> reponseListener, Response.ErrorListener errorListener) {
+    public ObjectRequest(int method, String url, Map<String, String> params, Response.Listener<JSONObject> responseListener, Response.ErrorListener errorListener) {
         super(method, url, errorListener);
-        this.listener = reponseListener;
+        this.listener = responseListener;
         this.params = params;
     }
 

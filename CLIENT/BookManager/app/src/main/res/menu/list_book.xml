@@ -5,4 +5,10 @@
         android:title="@string/action_settings"
         android:orderInCategory="100"
         android:showAsAction="never" />
+
+    <item android:id="@+id/action_refresh"
+        android:icon="@android:drawable/stat_notify_sync"
+        android:orderInCategory="100"
+        android:title="@string/action_sync"
+        android:showAsAction="ifRoom" />
 </menu>

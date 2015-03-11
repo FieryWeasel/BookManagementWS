@@ -32,5 +32,8 @@
     <string name="title_activity_navigation">NavigationActivity</string>
     <string name="drawer_open">Open</string>
     <string name="drawer_close">Close</string>
+    <string name="wait">Please wait...</string>
+    <string name="authenticating">Authenticating...</string>
+    <string name="action_sync">Sync</string>
 
 </resources>
