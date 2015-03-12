@@ -12,16 +12,10 @@ import android.view.View;
 import android.widget.EditText;
 
 import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
 import com.lp.bookmanager.R;
-import com.lp.bookmanager.data_container.UserManager;
 import com.lp.bookmanager.model.Account;
-import com.lp.bookmanager.model.Book;
-import com.lp.bookmanager.model.User;
 import com.lp.bookmanager.tools.Constants;
 import com.lp.bookmanager.tools.network.NetworkRequests;
-
-import java.util.List;
 
 
 public class MainActivity extends Activity implements NetworkRequests.ConnectionListener, NetworkRequests.UserInfoListener {
@@ -47,6 +41,8 @@ public class MainActivity extends Activity implements NetworkRequests.Connection
 
                 mRingProgressDialog = ProgressDialog.show(MainActivity.this, getString(R.string.wait), getString(R.string.authenticating), true);
                 mRingProgressDialog.setCancelable(false);
+
+
 
 
                 NetworkRequests.connect(MainActivity.this, Account.getCryptedfkey(password, login), MainActivity.this);
@@ -87,7 +83,7 @@ public class MainActivity extends Activity implements NetworkRequests.Connection
         super.onActivityResult(requestCode, resultCode, data);
 
         if( resultCode == RESULT_OK && requestCode == Constants.SIGN_IN_SUCCESSFUL){
-            Intent intent = new Intent(MainActivity.this, NavigationActivity.class);
+            Intent intent = new Intent(MainActivity.this, ListBookActivity.class);
             startActivity(intent);
             finish();
         }
@@ -97,7 +93,8 @@ public class MainActivity extends Activity implements NetworkRequests.Connection
     public void onConnectionSucceeded(String userId) {
 
         if(userId.equalsIgnoreCase("")){
-            mRingProgressDialog.dismiss();
+            Intent intent = new Intent(MainActivity.this, ListBookActivity.class);
+            startActivity(intent);
         }else{
             NetworkRequests.getUSerInfo(MainActivity.this, userId, MainActivity.this);
         }
@@ -119,23 +116,18 @@ public class MainActivity extends Activity implements NetworkRequests.Connection
 
     @Override
     public void onUserInfoCorrectlyRetrieved(String jsonUser) {
-        Gson gson = new Gson();
-        List<User> list = gson.fromJson(jsonUser, new TypeToken<List<User>>(){}.getType());
-        UserManager.getInstance().setUser(list.get(0));
-
         mRingProgressDialog.dismiss();
-        Intent intent = new Intent(MainActivity.this, NavigationActivity.class);
+        Intent intent = new Intent(MainActivity.this, ListBookActivity.class);
         intent.putExtra("UserRetrieved", true);
+        intent.putExtra("userJson", jsonUser);
         startActivity(intent);
-        finish();
     }
 
     @Override
     public void onFailToRetrieveUserInfo() {
         mRingProgressDialog.dismiss();
-        Intent intent = new Intent(MainActivity.this, NavigationActivity.class);
+        Intent intent = new Intent(MainActivity.this, ListBookActivity.class);
         intent.putExtra("UserRetrieved", false);
         startActivity(intent);
-        finish();
     }
 }

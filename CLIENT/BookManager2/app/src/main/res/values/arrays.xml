@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="drawer_Titles">
+        <item>Books</item>
+        <item>Reviews</item>
+        <item>Account</item>
+    </string-array>
+</resources>

@@ -9,13 +9,11 @@ public class User {
     private String last_name;
     private String nickname;
     private String birth_date;
-    private String crypted_key;
 
     public User() {
     }
 
-    public User(String first_name, String last_name, String nickname, String birth_date, String crypted_key, String mail) {
-        this.crypted_key = crypted_key;
+    public User(String first_name, String last_name, String nickname, String birth_date, String mail) {
         this.user_id = -1;
         this.first_name = first_name;
         this.last_name = last_name;
@@ -72,13 +70,5 @@ public class User {
 
     public void setMail(String mail) {
         this.mail = mail;
-    }
-
-    public String getCrypted_key() {
-        return crypted_key;
-    }
-
-    public void setCrypted_key(String crypted_key) {
-        this.crypted_key = crypted_key;
     }
 }
