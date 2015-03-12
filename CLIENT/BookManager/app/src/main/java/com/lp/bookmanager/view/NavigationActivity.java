@@ -14,6 +14,8 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
 import com.lp.bookmanager.R;
+import com.lp.bookmanager.tools.network.NetworkRequests;
+import com.lp.bookmanager.view.fragments.BooksFragment;
 
 public class NavigationActivity extends Activity {
 
@@ -23,6 +25,7 @@ public class NavigationActivity extends Activity {
     private CharSequence mTitle;
     private CharSequence mDrawerTitle;
     private ActionBarDrawerToggle mDrawerToggle;
+    private Fragment mFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,7 +50,6 @@ public class NavigationActivity extends Activity {
 
         // Set the drawer toggle as the DrawerListener
         mDrawerLayout.setDrawerListener(mDrawerToggle);
-
         mDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout,
                 R.drawable.ic_navigation_drawer, R.string.drawer_open, R.string.drawer_close) {
 
@@ -65,25 +67,22 @@ public class NavigationActivity extends Activity {
                 invalidateOptionsMenu(); // creates call to onPrepareOptionsMenu()
             }
         };
-
+        selectItem(0);
     }
 
     private void selectItem(int position) {
         // Create a new fragment and specify the planet to show based on position
-        Fragment fragment;
         Bundle args = new Bundle();
         String tag;
         switch (position){
             case 0 :
-                fragment = new Fragment();
-                args.putInt("", position);
-                fragment.setArguments(args);
-                tag = "0";
+                mFragment = new BooksFragment();
+                tag = "ListBooks";
                 break;
             default:
-                fragment = new Fragment();
+                mFragment = new Fragment();
                 args.putInt("", position);
-                fragment.setArguments(args);
+                mFragment.setArguments(args);
                 tag = "default";
                 break;
         }
@@ -91,7 +90,7 @@ public class NavigationActivity extends Activity {
         // Insert the fragment by replacing any existing fragment
         FragmentManager fragmentManager = getFragmentManager();
         fragmentManager.beginTransaction()
-                .replace(R.id.content_frame, fragment)
+                .replace(R.id.content_frame, mFragment)
                 .addToBackStack(tag)
                 .commit();
 
@@ -115,18 +114,4 @@ public class NavigationActivity extends Activity {
         return true;
     }
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
-        }
-
-        return super.onOptionsItemSelected(item);
-    }
 }

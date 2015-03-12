@@ -47,8 +47,6 @@ public class ListBookActivity extends Activity implements NetworkRequests.BookLi
         int id = item.getItemId();
         if (id == R.id.action_settings) {
             return true;
-        }else if(id == R.id.action_refresh){
-            NetworkRequests.GetBookList(ListBookActivity.this, ListBookActivity.this);
         }
         return super.onOptionsItemSelected(item);
     }

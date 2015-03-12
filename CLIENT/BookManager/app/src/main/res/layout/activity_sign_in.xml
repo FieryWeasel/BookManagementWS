@@ -86,9 +86,9 @@
                 <ImageButton
                     android:id="@+id/birthDatePicker"
                     android:src="@drawable/ic_calendar"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="0.5"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:scaleType="fitCenter"
                     android:layout_gravity="center_vertical"
                     android:text="@string/choose"
                     android:background="@android:color/white"/>
