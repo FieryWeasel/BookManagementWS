@@ -74,6 +74,26 @@ function add($connectInfos){
 		return;
 	}
 	
+	$jsonObj = getResultFromDataBase('SELECT * FROM book WHERE LOWER(isbn)=LOWER(\''. $connectInfos['book_id'] .'\')');
+	
+	if($jsonObj == ""){
+		displayDebugMsg("Error - No book correpond to the 'book_id' argument");
+		$arr_response[$keys->RES_key] = $keys->RES_Result_No;
+		$arr_response[$keys->ERR_key] = $keys->ERR_No_Result_Found;
+		echo(json_encode($arr_response));
+		return;
+	}
+	
+	$jsonObj = getResultFromDataBase('SELECT * FROM user WHERE id='. $connectInfos['user_id'] .'');
+	
+	if($jsonObj == ""){
+		displayDebugMsg("Error - No book correpond to the 'user_id' argument");
+		$arr_response[$keys->RES_key] = $keys->RES_Result_No;
+		$arr_response[$keys->ERR_key] = $keys->ERR_No_Result_Found;
+		echo(json_encode($arr_response));
+		return;
+	}
+	
 	// Try to add a book on the table book
 	$res = getResultFromDataBase('INSERT INTO review (book_id, user_id, mark, comment, title) VALUES ("'. $connectInfos['book_id'] .'", '. $connectInfos['user_id'] .', '. $connectInfos['mark'] .', "'. $connectInfos['comment'] .'", "'. $connectInfos['title'] .'")');
 	

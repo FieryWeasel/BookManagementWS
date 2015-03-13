@@ -9,7 +9,10 @@ function custumFunction($name_function){
 			delete($_POST);
 			break;
 		case "getCover":
-			getGoogleBook($_POST);
+			getGoogleCover($_POST);
+			break;
+		case "getInfos":
+			getGoogleInfos($_POST);
 			break;
 		default:
 			?>No function to launch<br/><?php
@@ -105,6 +108,15 @@ function add($connectInfos){
 	if($jsonObj != ""){
 		$arr_response[$keys->RES_key] = $keys->RES_Result_No;
 		$arr_response[$keys->ERR_key] = $keys->ERR_Add_Key_Already_Exist;
+		echo(json_encode($arr_response));
+		return;
+	}
+	
+	$jsonObj = getResultFromDataBase('SELECT * FROM author WHERE id='.$connectInfos['author_id']);
+	
+	if($jsonObj == ""){
+		$arr_response[$keys->RES_key] = $keys->RES_Result_No;
+		$arr_response[$keys->ERR_key] = $keys->ERR_No_Result_Found;
 		echo(json_encode($arr_response));
 		return;
 	}
@@ -220,7 +232,7 @@ function modify($connectInfos){
 	echo(json_encode($arr_response));
 }
 
-function getGoogleBook($connectInfos){
+function getGoogleCover($connectInfos){
 	$keys = new keys();
 
 	// Verify informations about the request
@@ -260,6 +272,42 @@ function getGoogleBook($connectInfos){
 		$arr_response[$keys->RES_key] = $keys->RES_Result_No;
 		$arr_response[$keys->ERR_key] = $keys->ERR_Bad_Arguments;
 	}
+
+	echo(json_encode($arr_response));
+}
+
+function getGoogleInfos($connectInfos){
+	$keys = new keys();
+
+	// Verify informations about the request
+	if(!isset($connectInfos['isbn']))
+	{
+		displayDebugMsg("Error - Need a 'isbn' argment");
+		$arr_response[$keys->RES_key] = $keys->RES_Result_No;
+		$arr_response[$keys->ERR_key] = $keys->ERR_Bad_Arguments;
+		echo(json_encode($arr_response));
+		return;
+	}
+	
+	$ch = curl_init('https://www.googleapis.com/books/v1/volumes?q=isbn:'. preg_replace('/[^A-Za-z0-9]/', '', $connectInfos['isbn']) .'&country=FR');
+	curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+	curl_setopt($ch, CURLOPT_HEADER, 0);
+	$page = curl_exec($ch);
+	curl_close($ch);
+	$data = json_decode($page, true);
+	
+	if($data['totalItems'] == 0){
+		displayDebugMsg("Error - No data find for this isbn");
+		$arr_response[$keys->RES_key] = $keys->RES_Result_No;
+		$arr_response[$keys->ERR_key] = $keys->ERR_No_Result_Found;
+		echo(json_encode($arr_response));
+		return;
+	}
+	
+	$arr_response[$keys->RES_key] = $keys->RES_Result_Yes;
+	$arr_response['books'][0]['title'] = $data['items'][0]['volumeInfo']['title'];
+	$arr_response['books'][0]['authors'] = $data['items'][0]['volumeInfo']['authors'][0];
+	$arr_response['books'][0]['description'] = $data['items'][0]['volumeInfo']['description'];
 
 	echo(json_encode($arr_response));
 }
