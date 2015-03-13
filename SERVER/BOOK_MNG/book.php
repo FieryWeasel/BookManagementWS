@@ -3,6 +3,20 @@ include_once '../conectdb.php';
 include_once '../debug.php';
 include_once '../keys.php';
 
+function custumFunction($name_function){
+	switch ($name_function){
+		case "delete":
+			delete($_POST);
+			break;
+		case "getCover":
+			getGoogleBook($_POST);
+			break;
+		default:
+			?>No function to launch<br/><?php
+			break;
+	}
+}
+
 function get($connectInfos) {
 	$keys = new keys();
 	
@@ -39,6 +53,29 @@ function get($connectInfos) {
 		$arr_response[$keys->RES_key] = $keys->RES_Result_No;
 		$arr_response[$keys->ERR_key] = $keys->ERR_No_Result_Found;
 	} else {
+		$index = 0;
+		while($jsonObj[$index] != NULL){
+			$ch = curl_init('https://www.googleapis.com/books/v1/volumes?q=isbn:'. preg_replace('/[^A-Za-z0-9]/', '', $jsonObj[$index]['isbn']) .'&country=FR');
+			curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+			curl_setopt($ch, CURLOPT_HEADER, 0);
+			$page = curl_exec($ch);
+			curl_close($ch);
+			$data = json_decode($page, true);
+			
+			if($data['totalItems'] == 0){
+				$jsonObj[$index]['cover'] = '#';
+			} else {
+				if(isset($connectInfos['size']) && strcmp($connectInfos['size'], 'small_thumbnail') == 0){
+					$jsonObj[$index]['cover'] = $data['items'][0]['volumeInfo']['imageLinks']['smallThumbnail'];
+				} else if(isset($connectInfos['size']) && strcmp($connectInfos['size'], 'thumbnail') == 0){
+					$jsonObj[$index]['cover'] = $data['items'][0]['volumeInfo']['imageLinks']['thumbnail'];
+				} else {
+					$jsonObj[$index]['cover'] = $data['items'][0]['volumeInfo']['imageLinks']['thumbnail'];
+				}
+			}
+			$index++;
+		}
+				
 		$arr_response[$keys->RES_key] = $keys->RES_Result_Yes;
 		$arr_response['books'] = $jsonObj;
 	}
@@ -183,15 +220,48 @@ function modify($connectInfos){
 	echo(json_encode($arr_response));
 }
 
-//getGoogleBook();
+function getGoogleBook($connectInfos){
+	$keys = new keys();
 
-function getGoogleBook(){
-	$ch = curl_init("https://www.googleapis.com/books/v1/volumes?q=isbn:1408855658&country=FR");
+	// Verify informations about the request
+	if(		!isset($connectInfos['size'])
+		||	!isset($connectInfos['isbn']))
+	{
+		displayDebugMsg("Error - Need a 'size' / 'isbn' argment");
+		$arr_response[$keys->RES_key] = $keys->RES_Result_No;
+		$arr_response[$keys->ERR_key] = $keys->ERR_Bad_Arguments;
+		echo(json_encode($arr_response));
+		return;
+	}
+	
+	$ch = curl_init('https://www.googleapis.com/books/v1/volumes?q=isbn:'. preg_replace('/[^A-Za-z0-9]/', '', $connectInfos['isbn']) .'&country=FR');
 	curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 	curl_setopt($ch, CURLOPT_HEADER, 0);
-	$data = curl_exec($ch);
+	$page = curl_exec($ch);
 	curl_close($ch);
-	echo(json_encode($data));
+	$data = json_decode($page, true);
+	
+	if($data['totalItems'] == 0){
+		displayDebugMsg("Error - No data find for this isbn");
+		$arr_response[$keys->RES_key] = $keys->RES_Result_No;
+		$arr_response[$keys->ERR_key] = $keys->ERR_No_Result_Found;
+		echo(json_encode($arr_response));
+		return;
+	}
+	
+	if(strcmp($connectInfos['size'], 'small_thumbnail') == 0){
+		$arr_response[$keys->RES_key] = $keys->RES_Result_Yes;
+		$arr_response['cover'] = $data['items'][0]['volumeInfo']['imageLinks']['smallThumbnail'];
+	} else if(strcmp($connectInfos['size'], 'thumbnail') == 0){
+		$arr_response[$keys->RES_key] = $keys->RES_Result_Yes;
+		$arr_response['cover'] = $data['items'][0]['volumeInfo']['imageLinks']['thumbnail'];
+	} else {
+		displayDebugMsg("Error - No valid size arguments");
+		$arr_response[$keys->RES_key] = $keys->RES_Result_No;
+		$arr_response[$keys->ERR_key] = $keys->ERR_Bad_Arguments;
+	}
+
+	echo(json_encode($arr_response));
 }
 
 ?>

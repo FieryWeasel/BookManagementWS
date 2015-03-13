@@ -3,6 +3,14 @@ include_once '../conectdb.php';
 include_once '../debug.php';
 include_once '../keys.php';
 
+function custumFunction($name_function){
+	switch ($name_function){
+		default:
+			?>No function to launch<br/><?php
+			break;
+	}
+}
+
 function get($connectInfos) {
 	$keys = new keys();
 	

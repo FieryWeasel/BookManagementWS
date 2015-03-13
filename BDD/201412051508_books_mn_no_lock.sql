@@ -109,6 +109,7 @@ CREATE TABLE `review` (
   `book_id` varchar(255) CHARACTER SET utf8 NOT NULL DEFAULT '',
   `user_id` int(11) unsigned NOT NULL,
   `mark` int(11) DEFAULT NULL,
+  `title` varchar(255) CHARACTER SET utf8 DEFAULT '',
   `comment` varchar(255) CHARACTER SET utf8 DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `review_book` (`book_id`),
@@ -119,9 +120,9 @@ CREATE TABLE `review` (
 
 /*!40000 ALTER TABLE `review` DISABLE KEYS */;
 
-INSERT INTO `review` (`id`, `book_id`, `user_id`, `mark`, `comment`)
+INSERT INTO `review` (`id`, `book_id`, `user_id`, `mark`, `comment`, `title`)
 VALUES
-	(5,'0-553-57542-2',1,5,'AWESOME !');
+	(5,'0-553-57542-2',1,5,'AWESOME !', 'My review');
 
 /*!40000 ALTER TABLE `review` ENABLE KEYS */;
 

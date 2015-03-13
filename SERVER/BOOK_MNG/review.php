@@ -3,6 +3,17 @@ include_once '../conectdb.php';
 include_once '../debug.php';
 include_once '../keys.php';
 
+function custumFunction($name_function){
+	switch ($name_function){
+		case "delete":
+			delete($_POST);
+			break;
+		default:
+			?>No function to launch<br/><?php
+			break;
+	}
+}
+
 function get($connectInfos) {
 	$keys = new keys();
 	
@@ -10,7 +21,7 @@ function get($connectInfos) {
 	$strFinal = "";
 	$isFirstElement = true;
 	foreach ($connectInfos as $key => $value){
-		if(strcmp($key, 'book_id') == 0 || strcmp($key, 'comment') == 0){
+		if(strcmp($key, 'book_id') == 0 || strcmp($key, 'comment') == 0 || strcmp($key, 'title') == 0){
 			if($isFirstElement){
 					$strFinal .= 'WHERE ';
 			}
@@ -31,7 +42,7 @@ function get($connectInfos) {
 			$isFirstElement = false;
 		}
 	}
-	
+		
 	// Try to get the informations about book
 	$jsonObj = getResultFromDataBase('SELECT * FROM review '. $strFinal);
 
@@ -53,9 +64,10 @@ function add($connectInfos){
 	if(		!isset($connectInfos['book_id'])
 		||	!isset($connectInfos['user_id'])
 		||	!isset($connectInfos['mark'])
-		|| 	!isset($connectInfos['comment']))
+		|| 	!isset($connectInfos['comment'])
+		|| 	!isset($connectInfos['title']))
 	{
-		displayDebugMsg("Error - Need a 'book_id' / 'user_id' / 'mark' / 'comment' argments");
+		displayDebugMsg("Error - Need a 'book_id' / 'user_id' / 'mark' / 'comment' / 'title' argments");
 		$arr_response[$keys->RES_key] = $keys->RES_Result_No;
 		$arr_response[$keys->ERR_key] = $keys->ERR_Bad_Arguments;
 		echo(json_encode($arr_response));
@@ -63,7 +75,7 @@ function add($connectInfos){
 	}
 	
 	// Try to add a book on the table book
-	$res = getResultFromDataBase('INSERT INTO review (book_id, user_id, mark, comment) VALUES ("'. $connectInfos['book_id'] .'", '. $connectInfos['user_id'] .', '. $connectInfos['mark'] .', "'. $connectInfos['comment'] .'")');
+	$res = getResultFromDataBase('INSERT INTO review (book_id, user_id, mark, comment, title) VALUES ("'. $connectInfos['book_id'] .'", '. $connectInfos['user_id'] .', '. $connectInfos['mark'] .', "'. $connectInfos['comment'] .'", "'. $connectInfos['title'] .'")');
 	
 	$jsonObj = getResultFromDataBase('SELECT * FROM review ORDER BY id DESC LIMIT 1');
 	
@@ -139,7 +151,7 @@ function modify($connectInfos){
 	$strFinal = "";
 	$isFirstElement = true;
 	foreach ($connectInfos as $key => $value){
-		if(strcmp($key, 'book_id') == 0 || strcmp($key, 'comment') == 0){
+		if(strcmp($key, 'book_id') == 0 || strcmp($key, 'comment') == 0 || strcmp($key, 'title') == 0){
 			if(!$isFirstElement){
 					$strFinal .= ',';
 			}
