@@ -12,49 +12,50 @@ if( isset($name[1]) ){
 		$name_function = $array[2];
 	}
 	
+	$directoryFind = false;
 	if( isset($array[1]) ){
-	switch ($array[1]){
-		case "user":
-			include_once 'user.php';
-			break;
-		case "book":
-			include_once 'book.php';
-			break;
-		case "review":
-			include_once 'review.php';
-			break;
-		case "type":
-			include_once 'type.php';
-			break;
-		case "author":
-			include_once 'author.php';
-			break;
-		default:
-			?>No directory to include<br/><?php
-			break;
-		}
+		switch ($array[1]){
+			case "user":
+				include_once 'user.php';
+				$directoryFind = true;
+				break;
+			case "book":
+				include_once 'book.php';
+				$directoryFind = true;
+				break;
+			case "review":
+				include_once 'review.php';
+				$directoryFind = true;
+				break;
+			case "type":
+				include_once 'type.php';
+				$directoryFind = true;
+				break;
+			case "author":
+				include_once 'author.php';
+				$directoryFind = true;
+				break;
+			default:
+				?>No directory to include<br/><?php
+				break;
+			}
 		
-	switch ($name_function){
-		case "get":
-			get($_POST);
-			break;
-		case "add":
-			add($_POST);
-			break;
-		case "modify":
-			modify($_POST);
-			break;
-		case "delete":
-			if( $array[1] != "type" && $array[1] != "author")
-				delete($_POST);
-			break;
-		default:
-			?>No function to launch<br/><?php
-			break;
+		if($directoryFind){
+			switch ($name_function){
+				case "get":
+					get($_POST);
+					break;
+				case "add":
+					add($_POST);
+					break;
+				case "modify":
+					modify($_POST);
+					break;
+				default:
+					custumFunction($name_function);
+					break;
+			}
 		}
-		
 	}
-
-	
 }
 ?>

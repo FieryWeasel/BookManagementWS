@@ -3,6 +3,14 @@ include_once '../conectdb.php';
 include_once '../debug.php';
 include_once '../keys.php';
 
+function custumFunction($name_function){
+	switch ($name_function){
+		default:
+			?>No function to launch<br/><?php
+			break;
+	}
+}
+
 function get($connectInfos) {
 	$keys = new keys();
 	
@@ -61,7 +69,16 @@ function add($connectInfos){
 	}
 	
 	// Try to insert user in the table user
-	$res = getResultFromDataBase("INSERT INTO author (first_name, last_name) VALUES ('".$connectInfos['first_name']."', '".$connectInfos['last_name']."')");
+	$jsonObj = getResultFromDataBase('SELECT * FROM author WHERE LOWER(first_name)=LOWER(\''. $connectInfos['first_name'] .'\') AND LOWER(last_name)=LOWER(\''. $connectInfos['last_name'] .'\')');
+	
+	if($jsonObj != ""){
+		$arr_response[$keys->RES_key] = $keys->RES_Result_Yes;
+		$arr_response['id'] = $jsonObj[0]['id'];
+		echo(json_encode($arr_response));
+		return;
+	}
+	
+	$res = getResultFromDataBase("INSERT INTO author (first_name, last_name) VALUES ('". $connectInfos['first_name'] ."', '". $connectInfos['last_name'] ."')");
 
 	$jsonObj = getResultFromDataBase('SELECT * FROM author ORDER BY id DESC LIMIT 1');
 		
@@ -70,6 +87,7 @@ function add($connectInfos){
 		&&	strcmp($jsonObj[0]['first_name'], $connectInfos['first_name']) == 0 
 		&& 	strcmp($jsonObj[0]['last_name'], $connectInfos['last_name']) == 0){
 		$arr_response[$keys->RES_key] = $keys->RES_Result_Yes;
+		$arr_response['id'] = $jsonObj[0]['id'];
 	} else {
 		$arr_response[$keys->RES_key] = $keys->RES_Result_No;
 		$arr_response[$keys->ERR_key] = $keys->ERR_Value_Cannot_Be_Modify;
