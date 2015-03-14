@@ -1,0 +1,67 @@
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    tools:context="com.lp.bookmanager.view.AddReviewActivity"
+    android:orientation="vertical">
+
+    <TextView
+        android:id="@+id/author_review"
+        android:text="@string/author"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="@android:style/TextAppearance.Medium"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/mark"
+            android:paddingTop="10dp"/>
+
+        <TextView
+            android:id="@+id/grade_review"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:text="@string/defaultGrade"
+            android:gravity="right"
+            android:paddingTop="10dp"/>
+
+        </LinearLayout>
+
+
+    <SeekBar
+        android:id="@+id/mark_review"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:max="10"
+        android:paddingTop="10dp"/>
+
+    <EditText
+        android:id="@+id/title_review"
+        android:hint="@string/title_review"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:singleLine="true"
+        android:paddingTop="10dp"/>
+
+    <EditText
+        android:id="@+id/review_review"
+        android:hint="@string/review"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="top"
+        android:paddingTop="10dp"/>
+
+
+</LinearLayout>

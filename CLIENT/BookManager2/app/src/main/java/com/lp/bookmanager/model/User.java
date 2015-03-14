@@ -4,17 +4,19 @@ package com.lp.bookmanager.model;
  * Created by iem on 12/12/14.
  */
 public class User {
-    private int user_id;
+    private int id;
     private String first_name;
     private String last_name;
     private String nickname;
     private String birth_date;
+    private String crypted_key;
 
     public User() {
     }
 
-    public User(String first_name, String last_name, String nickname, String birth_date, String mail) {
-        this.user_id = -1;
+    public User(String first_name, String last_name, String nickname, String birth_date, String crypted_key, String mail) {
+        this.crypted_key = crypted_key;
+        this.id = -1;
         this.first_name = first_name;
         this.last_name = last_name;
         this.nickname = nickname;
@@ -24,12 +26,12 @@ public class User {
 
     private String mail;
 
-    public int getUser_id() {
-        return user_id;
+    public int getId() {
+        return id;
     }
 
-    public void setUser_id(int user_id) {
-        this.user_id = user_id;
+    public void setId(int id) {
+        this.id = id;
     }
 
     public String getFirst_name() {
@@ -70,5 +72,13 @@ public class User {
 
     public void setMail(String mail) {
         this.mail = mail;
+    }
+
+    public String getCrypted_key() {
+        return crypted_key;
+    }
+
+    public void setCrypted_key(String crypted_key) {
+        this.crypted_key = crypted_key;
     }
 }

@@ -1,15 +1,26 @@
 package com.lp.bookmanager.model;
 
+import java.io.Serializable;
+
 /**
  * Created by iem on 05/12/14.
  */
-public class Book {
+public class Book implements Serializable{
 
     private String isbn;
     private String title;
     private int type_id;
     private int author_id;
     private String summary;
+    private String cover;
+
+    public Book(String isbn, String title, int type_id, int author_id, String summary, String cover) {
+        this.isbn = isbn;
+        this.title = title;
+        this.type_id = type_id;
+        this.author_id = author_id;
+        this.summary = summary;
+    }
 
     public Book(String isbn, String title, int type_id, int author_id, String summary) {
         this.isbn = isbn;
@@ -57,5 +68,13 @@ public class Book {
 
     public void setSummary(String summary) {
         this.summary = summary;
+    }
+
+    public String getCover() {
+        return cover;
+    }
+
+    public void setCover(String cover) {
+        this.cover = cover;
     }
 }

@@ -3,7 +3,7 @@
 <android.support.v7.widget.CardView
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:card_view="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/card_book_detail"
+    android:id="@+id/root_review"
     android:orientation="horizontal"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
@@ -12,23 +12,36 @@
     card_view:cardElevation="5dp">
 
     <LinearLayout
-        android:orientation="vertical" android:layout_width="match_parent"
+        android:orientation="vertical"
+        android:layout_width="match_parent"
         android:layout_height="match_parent">
 
         <TextView
+            android:id="@+id/title_review_item"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Titre"/>
+            android:textStyle="bold"
+            android:text="Title"/>
 
         <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Auteur"/>
-
-        <TextView
+            android:id="@+id/review_review_item"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Review"/>
+
+        <TextView
+            android:id="@+id/grade_review_item"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Grade"/>
+
+        <TextView
+            android:id="@+id/author_review_item"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textStyle="italic"
+            android:gravity="right"
+            android:text="Auteur"/>
     </LinearLayout>
 
 </android.support.v7.widget.CardView>

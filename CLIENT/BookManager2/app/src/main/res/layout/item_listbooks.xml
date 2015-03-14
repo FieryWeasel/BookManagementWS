@@ -3,6 +3,7 @@
 
 <android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:card_view="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/root_item_bookList"
     android:orientation="horizontal"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -16,7 +17,7 @@
         android:layout_height="wrap_content">
 
         <ImageView
-            android:id="@+id/icon_item_bookList"
+            android:id="@+id/cover_item_bookList"
             android:layout_width="100dp"
             android:layout_height="100dp"
             android:padding="5dp"
@@ -27,8 +28,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:padding="5dp"
-            android:layout_toEndOf="@+id/icon_item_bookList"
-            android:layout_toRightOf="@+id/icon_item_bookList"
+            android:layout_toEndOf="@+id/cover_item_bookList"
+            android:layout_toRightOf="@+id/cover_item_bookList"
             android:textStyle="bold|italic"
             android:text="@string/title"/>
 
@@ -38,8 +39,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:padding="5dp"
-            android:layout_toEndOf="@+id/icon_item_bookList"
-            android:layout_toRightOf="@+id/icon_item_bookList"
+            android:layout_toEndOf="@+id/cover_item_bookList"
+            android:layout_toRightOf="@+id/cover_item_bookList"
             android:layout_below="@+id/title_item_bookList"
             android:text="@string/author"/>
 
@@ -49,8 +50,8 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:padding="5dp"
-            android:layout_toEndOf="@+id/icon_item_bookList"
-            android:layout_toRightOf="@+id/icon_item_bookList"
+            android:layout_toEndOf="@+id/cover_item_bookList"
+            android:layout_toRightOf="@+id/cover_item_bookList"
             android:layout_below="@+id/author_item_bookList"/>
 
     </RelativeLayout>

@@ -3,8 +3,8 @@ package com.lp.bookmanager.view;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
+import android.app.ProgressDialog;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -16,7 +16,9 @@ import android.widget.TextView;
 
 import com.lp.bookmanager.R;
 import com.lp.bookmanager.data_container.UserManager;
+import com.lp.bookmanager.model.Account;
 import com.lp.bookmanager.model.User;
+import com.lp.bookmanager.tools.network.NetworkRequests;
 
 import java.util.Calendar;
 import java.util.regex.Matcher;
@@ -54,26 +56,36 @@ public class SignInActivity extends Activity implements DatePickerDialog.OnDateS
         findViewById(R.id.login_validate).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                boolean filedsOk = verifyNewUserInformation();
-                if(filedsOk) {
-                    // Todo : Send request to WebService
-                    int response = 1;
-                    if (response != -1) {
-                        //TODO construct user from server response
-                        User user = new User(mETFirstName.getText().toString(), mETLastName.getText().toString(),
-                                mETLogin.getText().toString(), mETBirthDate.getText().toString(), mETMail.getText().toString());
-                        UserManager.getInstance().setUser(user);
-                        finish();
-                    } else {
-                        AlertDialog.Builder dialog = new AlertDialog.Builder(SignInActivity.this);
-                        dialog.setMessage(R.string.errorNetWork)
-                                .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
-                                    public void onClick(DialogInterface dialog, int id) {
-                                        // FIRE ZE MISSILES!
-                                        dialog.dismiss();
-                                    }
-                                });
-                    }
+                boolean fieldsOk = verifyNewUserInformation();
+                if(fieldsOk) {
+                    final ProgressDialog ringProgressDialog = ProgressDialog.show(SignInActivity.this, getString(R.string.wait), getString(R.string.authenticating), true);
+                    ringProgressDialog.setCancelable(false);
+                    final User user = new User(mETFirstName.getText().toString(), mETLastName.getText().toString(),
+                            mETLogin.getText().toString(), mETBirthDate.getText().toString(),
+                            Account.getCryptedfkey(mETPassword.getText().toString(), mETLogin.getText().toString()), mETMail.getText().toString());
+
+                    NetworkRequests.createUser(SignInActivity.this, user, new NetworkRequests.UserCreatedListener() {
+                        @Override
+                        public void onUserCreatedSuccessful() {
+                            UserManager.getInstance().setUser(user);
+                            ringProgressDialog.dismiss();
+                            finish();
+                        }
+
+                        @Override
+                        public void onUserCreatedFailed() {
+                            ringProgressDialog.dismiss();
+                            AlertDialog.Builder dialog = new AlertDialog.Builder(SignInActivity.this);
+                            dialog.setMessage(R.string.errorNetWork)
+                                    .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+                                        public void onClick(DialogInterface dialog, int id) {
+                                            // FIRE ZE MISSILES!
+                                            dialog.dismiss();
+                                        }
+                                    });
+                        }
+                    });
+
                 }
 
             }
@@ -90,7 +102,7 @@ public class SignInActivity extends Activity implements DatePickerDialog.OnDateS
     }
 
     private boolean verifyNewUserInformation() {
-        boolean infosOk;
+        boolean infosOk = true;
 
         if(mETLogin.getText() == null
                 || mETLogin.getText().toString().equalsIgnoreCase("")
@@ -98,28 +110,24 @@ public class SignInActivity extends Activity implements DatePickerDialog.OnDateS
 
             mETLogin.setError(getString(R.string.loginError));
             infosOk = false;
-        }else
-            infosOk = true;
+        }
 
-        if(infosOk && (mETPassword.getText() == null
+        if((mETPassword.getText() == null
                 || mETPassword.getText().toString().equalsIgnoreCase("")
                 || mETPassword.getText().toString().length() < 8)){
 
             mETPassword.setError(getString(R.string.passwordError));
 
             infosOk = false;
-        }else {
-            infosOk = true;
         }
 
-        if(infosOk && (mETMail.getText() == null
+        if((mETMail.getText() == null
                 || mETMail.getText().toString().equalsIgnoreCase("")
                 || !isEmailValid(mETMail.getText().toString()) )){
 
             mETMail.setError(getString(R.string.mailError));
             infosOk = false;
-        }else
-            infosOk = true;
+        }
 
         return infosOk;
     }

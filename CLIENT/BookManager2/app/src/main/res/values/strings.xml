@@ -35,5 +35,23 @@
     <string name="wait">Please wait...</string>
     <string name="authenticating">Authenticating...</string>
     <string name="action_sync">Sync</string>
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="action_add_book">Add a book</string>
+    <string name="loading">Loading...</string>
+    <string name="title_activity_review_details">ReviewDetailsActivity</string>
+    <string name="title_activity_add_review">AddReviewActivity</string>
+    <string name="title_review">Title review</string>
+    <string name="review">Review</string>
+    <string name="mark">Mark</string>
+    <string name="action_save_review">Save review</string>
+    <string name="title_activity_add_book">AddBookActivity</string>
+    <string name="author_FN">Author first name</string>
+    <string name="author_LN">Author last name</string>
+    <string name="authorFN_eror">Author must have a first name</string>
+    <string name="authorLN_eror">Author must have a last name</string>
+    <string name="title_error">Book must have a title</string>
+    <string name="isbn_error">Book must have an ISBN, without dash</string>
+    <string name="summary_error">Book must have a summary</string>
+    <string name="defaultGrade">5/10</string>
 
 </resources>
